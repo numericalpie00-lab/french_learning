@@ -1,3 +1,6 @@
+/** 全局三档语言模式：纯法语沉浸 / 英文词源锚点 / 中文大白话逻辑 */
+export type Lang = 'fr' | 'en' | 'zh'
+
 /** 表达选项：供用户在沙盘中做直觉选择 */
 export interface ExpressionOption {
   text: string
@@ -17,9 +20,15 @@ export interface TrilingualMapping {
   zh_logic: string
 }
 
+/** 从三语映射中按全局语言模式取内容 */
+export function pickMapping(mapping: TrilingualMapping, lang: Lang): string {
+  return lang === 'fr' ? mapping.fr : lang === 'en' ? mapping.en_anchor : mapping.zh_logic
+}
+
 export interface AudioClip {
   url: string
-  transcript: string
+  /** 字幕原文及译文，跟随全局三档语言切换 */
+  transcript: Record<Lang, string>
 }
 
 /** TCF B2 题库条目 */

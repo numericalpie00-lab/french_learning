@@ -8,8 +8,9 @@
 - **Vite + React + TypeScript**
 - **Tailwind CSS v4**（`@tailwindcss/vite` 插件，设计令牌见 `src/index.css` 的 `@theme`）
 - **reactflow** — 左侧知识图谱
-- **framer-motion** — 沙盘揭示动效
+- **framer-motion** — 沙盘揭示动效与语言切换过渡
 - **lucide-react** — 图标
+- **zustand** — 全局三档语言状态（`src/store/langStore.ts`）
 
 ## 启动
 
@@ -21,8 +22,15 @@ npm run build    # 类型检查 + 生产构建
 
 ## 页面布局
 
+- **顶部**：`src/components/LangToggle.tsx`，全局三档语言开关（纯法语沉浸 / 英文词源锚点 / 中文大白话逻辑），状态存于 zustand，沙盘解构卡片与音频字幕全部联动。
 - **图谱区**（左侧/主体）：`src/components/GraphPanel.tsx`，按「TCF B2 → 交际功能分类 → 场景卡片」展开，点击卡片加载到沙盘。
 - **沙盘演练区**（右侧）：`src/components/SandboxPanel.tsx`，展示沉浸场景，用户做直觉选择后揭示三语映射、TCF 考点与音频。
+
+## 音频系统
+
+- `src/hooks/useAudio.ts`：管理播放/暂停/进度/结束/加载失败，`url` 变化时自动停止并重建。
+- `src/components/AudioPlayer.tsx`：Play/Pause 圆钮 + 可点击进度条；播放期间展示字幕，字幕跟随全局语言开关在法/英/中之间切换。
+- `public/audio/*.wav` 目前是程序生成的占位钟琴音，替换为真实录音/TTS 即可（保持文件名或改 JSON 中的 `audio.url`）。
 
 ## 数据结构
 
@@ -42,11 +50,14 @@ npm run build    # 类型检查 + 生产构建
     "zh_logic": "…"                        // 中文大白话逻辑拆解
   },
   "tcf_b2_takeaway": "…",                 // 高度相关的 TCF 考点/真题示例
-  "audio": { "url": "/audio/….mp3", "transcript": "…" }
+  "audio": {
+    "url": "/audio/….wav",
+    "transcript": { "fr": "…", "en": "…", "zh": "…" } // 字幕三语版本，随全局开关切换
+  }
 }
 ```
 
-音频文件放在 `public/audio/`（当前为占位路径，`transcript` 已就位）。
+音频文件放在 `public/audio/`。
 
 ## Warm Analog 设计令牌
 

@@ -1,37 +1,40 @@
 import { useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import {
-  AudioLines,
+  Anchor,
   BookOpenText,
   Check,
+  Feather,
   Lightbulb,
   MessageCircleQuestion,
+  MessagesSquare,
   Target,
   X,
 } from 'lucide-react'
-import type { TcfB2Item } from '../data/types'
+import { pickMapping, type Lang, type TcfB2Item } from '../data/types'
+import { useLangStore } from '../store/langStore'
+import AudioPlayer from './AudioPlayer'
 
 interface SandboxPanelProps {
   item: TcfB2Item | null
 }
 
-type Lang = 'fr' | 'en_anchor' | 'zh_logic'
+const mappingBadge: Record<Lang, { label: string; icon: typeof Feather }> = {
+  fr: { label: '纯法语沉浸', icon: Feather },
+  en: { label: '英文词源锚点', icon: Anchor },
+  zh: { label: '中文大白话逻辑', icon: MessagesSquare },
+}
 
-const langTabs: { key: Lang; label: string }[] = [
-  { key: 'fr', label: 'FR 沉浸' },
-  { key: 'en_anchor', label: 'EN 词源锚点' },
-  { key: 'zh_logic', label: '中文逻辑' },
-]
-
-/** 沙盘演练区：直觉选择 → 三语解构 → 考点提炼 */
+/** 沙盘演练区：直觉选择 → 三语解构（跟随全局开关）→ 考点提炼 → 音频 */
 export default function SandboxPanel({ item }: SandboxPanelProps) {
   const [picked, setPicked] = useState<number | null>(null)
-  const [lang, setLang] = useState<Lang>('zh_logic')
+  const lang = useLangStore((s) => s.lang)
 
   useEffect(() => {
     setPicked(null)
-    setLang('zh_logic')
   }, [item?.id])
+
+  const badge = mappingBadge[lang]
 
   return (
     <section className="flex h-full flex-col overflow-hidden rounded-2xl border border-ink/10 bg-cream shadow-(--shadow-card)">
@@ -123,7 +126,7 @@ export default function SandboxPanel({ item }: SandboxPanelProps) {
                 </div>
               </div>
 
-              {/* 选择后揭示：三语映射 + 考点 + 音频 */}
+              {/* 选择后揭示：三语映射（跟随全局开关）+ 考点 + 音频 */}
               <AnimatePresence>
                 {picked !== null && (
                   <motion.div
@@ -133,32 +136,20 @@ export default function SandboxPanel({ item }: SandboxPanelProps) {
                     className="space-y-5"
                   >
                     <div className="rounded-2xl border border-ink/10 bg-parchment p-4 shadow-(--shadow-soft)">
-                      <div className="mb-3 flex gap-1.5">
-                        {langTabs.map((t) => (
-                          <button
-                            key={t.key}
-                            onClick={() => setLang(t.key)}
-                            className={
-                              'rounded-full px-3 py-1 text-xs font-medium transition-colors ' +
-                              (lang === t.key
-                                ? 'bg-navy text-parchment'
-                                : 'bg-sand text-ink-soft hover:text-navy')
-                            }
-                          >
-                            {t.label}
-                          </button>
-                        ))}
+                      <div className="mb-2 flex items-center gap-1.5 text-xs font-semibold text-navy">
+                        <badge.icon className="h-3.5 w-3.5" />
+                        {badge.label}
                       </div>
                       <AnimatePresence mode="wait">
                         <motion.p
                           key={lang}
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          exit={{ opacity: 0 }}
-                          transition={{ duration: 0.15 }}
+                          initial={{ opacity: 0, y: 6 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -6 }}
+                          transition={{ duration: 0.18 }}
                           className="text-sm leading-relaxed text-ink"
                         >
-                          {item.trilingual_mapping[lang]}
+                          {pickMapping(item.trilingual_mapping, lang)}
                         </motion.p>
                       </AnimatePresence>
                     </div>
@@ -171,16 +162,7 @@ export default function SandboxPanel({ item }: SandboxPanelProps) {
                       <p className="text-sm leading-relaxed text-ink">{item.tcf_b2_takeaway}</p>
                     </div>
 
-                    <div className="rounded-2xl border border-ink/10 bg-cream p-4 shadow-(--shadow-soft)">
-                      <div className="mb-2 flex items-center gap-1.5 text-xs font-semibold text-navy">
-                        <AudioLines className="h-3.5 w-3.5" />
-                        听一遍 · Écoutez
-                      </div>
-                      <audio controls src={item.audio.url} className="mb-2 w-full" />
-                      <p className="text-sm italic leading-relaxed text-ink-soft">
-                        « {item.audio.transcript} »
-                      </p>
-                    </div>
+                    <AudioPlayer audio={item.audio} />
                   </motion.div>
                 )}
               </AnimatePresence>

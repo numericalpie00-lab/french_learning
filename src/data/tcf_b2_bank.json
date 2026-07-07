@@ -27,8 +27,12 @@
     },
     "tcf_b2_takeaway": "TCF Canada 口语 Tâche 2 常考'向陌生人/机构提出请求'（如请房东修暖气、请市政厅提供信息）。B2 评分点：必须自然使用条件式礼貌句（Pourriez-vous... / J'aimerais savoir si... / Serait-il possible de...），全程 vouvoiement 不掉链子。",
     "audio": {
-      "url": "/audio/tcf_b2_001.mp3",
-      "transcript": "Bonjour Madame Girard, excusez-moi de vous déranger. Je pars trois semaines au Canada... Pourriez-vous arroser mes plantes pendant mon absence ? Je vous en serais très reconnaissante."
+      "url": "/audio/tcf_b2_001.wav",
+      "transcript": {
+        "fr": "Bonjour Madame Girard, excusez-moi de vous déranger. Je pars trois semaines au Canada... Pourriez-vous arroser mes plantes pendant mon absence ? Je vous en serais très reconnaissante.",
+        "en": "Hello Madame Girard, sorry to disturb you. I'm leaving for Canada for three weeks... Could you water my plants while I'm away? I would be very grateful.",
+        "zh": "您好，Girard 太太，不好意思打扰您。我要去加拿大三周……我不在的时候，您能帮我浇浇花吗？那真是帮了大忙了。"
+      }
     }
   },
   {
@@ -59,8 +63,12 @@
     },
     "tcf_b2_takeaway": "TCF Canada 写作 Tâche 2/3 高频题型：写一封正式投诉信（服务差、商品缺陷、账单错误）。B2 评分点：格式完整（Madame, Monsieur / 结尾敬语），套语准确（Je me permets de... / Je vous saurais gré de bien vouloir me rembourser），语气坚定但不失礼。",
     "audio": {
-      "url": "/audio/tcf_b2_002.mp3",
-      "transcript": "Madame, Monsieur, je me permets de vous contacter au sujet d'un problème concernant ma commande numéro 4587. La machine à café reçue le 3 mars ne fonctionne plus depuis trois jours. Je vous saurais gré de bien vouloir procéder à un échange ou à un remboursement."
+      "url": "/audio/tcf_b2_002.wav",
+      "transcript": {
+        "fr": "Madame, Monsieur, je me permets de vous contacter au sujet d'un problème concernant ma commande numéro 4587. La machine à café reçue le 3 mars ne fonctionne plus depuis trois jours. Je vous saurais gré de bien vouloir procéder à un échange ou à un remboursement.",
+        "en": "Dear Sir or Madam, I am contacting you regarding a problem with my order number 4587. The coffee machine received on March 3rd stopped working after three days. I would be grateful if you could arrange an exchange or a refund.",
+        "zh": "尊敬的先生/女士：我就 4587 号订单的一个问题与您联系。3 月 3 日签收的咖啡机，用了三天就不工作了。烦请您安排换货或退款，不胜感激。"
+      }
     }
   }
 ]
