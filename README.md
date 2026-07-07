@@ -23,8 +23,8 @@ npm run build    # 类型检查 + 生产构建
 ## 页面布局
 
 - **顶部**：`src/components/LangToggle.tsx`，全局三档语言开关（纯法语沉浸 / 英文词源锚点 / 中文大白话逻辑），状态存于 zustand，沙盘解构卡片与音频字幕全部联动。
-- **图谱区**（左侧/主体）：`src/components/GraphPanel.tsx`，按「TCF B2 → 交际功能分类 → 场景卡片」展开，点击卡片加载到沙盘。
-- **沙盘演练区**（右侧）：`src/components/SandboxPanel.tsx`，展示沉浸场景，用户做直觉选择后揭示三语映射、TCF 考点与音频。
+- **语境直觉图谱**（左侧/主体）：`src/components/GraphPanel.tsx`，气泡按「交际目的」命名（请求、抱怨……），不按教材章节。自定义 `BubbleNode`（圆形气泡、缓慢漂浮、入场弹簧动画）+ 自定义 `BreathingEdge`（流动虚线呼吸明暗 + 巡游光点 + 进阶关系标签），连线代表语法进阶路线；题库暂未覆盖的目的显示为虚线锁定气泡。点击气泡进入沙盘。
+- **微型情境沙盘**（右侧）：`src/components/SandboxPanel.tsx`，分阶段渲染：A 情境代入 → 点击「代入好了，看表达」→ B 直觉选择（交错入场）→ C 三语解构（随全局开关）+ 音频 → D `tcf_b2_takeaway` 考点收尾于最下方。
 
 ## 音频系统
 
