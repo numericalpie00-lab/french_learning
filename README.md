@@ -28,9 +28,12 @@ npm run build    # 类型检查 + 生产构建
 
 ## 音频系统
 
-- `src/hooks/useAudio.ts`：管理播放/暂停/进度/结束/加载失败，`url` 变化时自动停止并重建。
-- `src/components/AudioPlayer.tsx`：Play/Pause 圆钮 + 可点击进度条；播放期间展示字幕，字幕跟随全局语言开关在法/英/中之间切换。
-- `public/audio/*.wav` 目前是程序生成的占位钟琴音，替换为真实录音/TTS 即可（保持文件名或改 JSON 中的 `audio.url`）。
+双模式播放器（`src/components/AudioPlayer.tsx`），右上角「音频 / 朗读」切换：
+
+- **音频模式**：`src/hooks/useAudio.ts` 播放录音文件，卡拉OK高亮由 `currentTime` 与句级时间戳匹配驱动，进度条可点击跳转。
+- **朗读模式（零成本 TTS）**：`src/hooks/useTts.ts` 用浏览器原生 SpeechSynthesis（fr-FR 音色优先，rate 0.92）逐句排队朗读法语原文，高亮由每句 utterance 的 `onstart` 事件驱动；无语音引擎的环境会在 2.5s 看门狗超时后优雅降级并提示切回音频模式。
+- **卡拉OK字幕**：`src/components/KaraokeTranscript.tsx` 逐句渲染，当前句高亮（左侧陶土色竖线 + 加深底色）并自动滚动到可视区；点击某句可跳转（音频模式 seek 到时间戳 / 朗读模式从该句重新开始）；句子文本跟随全局三档语言开关切换。
+- `public/audio/*.wav` 目前是程序生成的占位钟琴音，替换为真实录音即可（保持文件名或改 JSON 中的 `audio.url`）。
 
 ## 数据结构
 
@@ -52,7 +55,9 @@ npm run build    # 类型检查 + 生产构建
   "tcf_b2_takeaway": "…",                 // 高度相关的 TCF 考点/真题示例
   "audio": {
     "url": "/audio/….wav",
-    "transcript": { "fr": "…", "en": "…", "zh": "…" } // 字幕三语版本，随全局开关切换
+    "transcript": [                        // 按句切分 + 时间戳，三语文本随全局开关切换
+      { "start": 0, "end": 2.4, "fr": "…", "en": "…", "zh": "…" }
+    ]
   }
 }
 ```

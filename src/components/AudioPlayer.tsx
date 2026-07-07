@@ -1,8 +1,11 @@
+import { useEffect, useMemo, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { AudioLines, Pause, Play, VolumeX } from 'lucide-react'
+import { AudioLines, Headphones, Pause, Play, Speech, Square, VolumeX } from 'lucide-react'
 import { useAudio } from '../hooks/useAudio'
+import { useTts } from '../hooks/useTts'
 import type { AudioClip } from '../data/types'
 import { useLangStore } from '../store/langStore'
+import KaraokeTranscript from './KaraokeTranscript'
 
 function formatTime(seconds: number) {
   if (!Number.isFinite(seconds) || seconds <= 0) return '0:00'
@@ -11,80 +14,174 @@ function formatTime(seconds: number) {
   return `${m}:${s.toString().padStart(2, '0')}`
 }
 
+type PlayMode = 'file' | 'tts'
+
 interface AudioPlayerProps {
   audio: AudioClip
 }
 
-/** 简洁播放器：Play/Pause + 进度条；播放时展示跟随全局语言切换的字幕 */
+/**
+ * 双模式播放器：
+ * - 音频模式：播放录音文件，逐句高亮由时间戳驱动
+ * - 朗读模式：SpeechSynthesis (fr-FR) 逐句 TTS，高亮由 onstart 事件驱动
+ * 字幕文本跟随全局三档语言开关。
+ */
 export default function AudioPlayer({ audio }: AudioPlayerProps) {
   const lang = useLangStore((s) => s.lang)
-  const { isPlaying, hasStarted, progress, duration, error, toggle, seek } =
-    useAudio(audio.url)
+  const segments = audio.transcript
+  const frSentences = useMemo(() => segments.map((s) => s.fr), [segments])
+  const [mode, setMode] = useState<PlayMode>('file')
+
+  const file = useAudio(audio.url)
+  const tts = useTts(frSentences)
+
+  const fileActiveIndex = file.hasStarted
+    ? segments.findIndex((s) => file.currentTime >= s.start && file.currentTime < s.end)
+    : -1
+  const activeIndex = mode === 'file' ? fileActiveIndex : tts.activeIndex
+
+  const isBusy = mode === 'file' ? file.isPlaying : tts.isSpeaking
+  const modeError = mode === 'file' ? file.error : tts.error
+
+  // 字幕一旦展开就保持可见（便于复读/点句重播），切换题目时复位
+  const shouldReveal = file.hasStarted || tts.isSpeaking || modeError
+  const [revealed, setRevealed] = useState(false)
+  useEffect(() => {
+    if (shouldReveal) setRevealed(true)
+  }, [shouldReveal])
+  useEffect(() => {
+    setRevealed(false)
+  }, [audio.url])
+  const showTranscript = revealed || shouldReveal
+
+  const switchMode = (m: PlayMode) => {
+    if (m === mode) return
+    if (file.isPlaying) file.toggle()
+    tts.stop()
+    setMode(m)
+  }
+
+  const handleToggle = () => {
+    if (mode === 'file') file.toggle()
+    else tts.toggle()
+  }
+
+  const handleSelect = (i: number) => {
+    if (mode === 'file') {
+      if (file.duration) file.seek(segments[i].start / file.duration)
+    } else {
+      tts.speak(i)
+    }
+  }
 
   return (
     <div className="rounded-2xl border border-ink/10 bg-cream p-4 shadow-(--shadow-soft)">
       <div className="mb-3 flex items-center gap-1.5 text-xs font-semibold text-navy">
         <AudioLines className="h-3.5 w-3.5" />
         听一遍 · Écoutez
+        {/* 播放源切换：录音 / TTS 朗读 */}
+        <div className="ml-auto flex gap-1 rounded-full bg-sand p-0.5">
+          <button
+            onClick={() => switchMode('file')}
+            title="播放录音文件"
+            className={
+              'flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-semibold transition-colors ' +
+              (mode === 'file' ? 'bg-navy text-parchment' : 'text-ink-soft hover:text-navy')
+            }
+          >
+            <Headphones className="h-3 w-3" />
+            音频
+          </button>
+          <button
+            onClick={() => switchMode('tts')}
+            title="浏览器 TTS 朗读（SpeechSynthesis · fr-FR）"
+            className={
+              'flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-semibold transition-colors ' +
+              (mode === 'tts' ? 'bg-navy text-parchment' : 'text-ink-soft hover:text-navy')
+            }
+          >
+            <Speech className="h-3 w-3" />
+            朗读
+          </button>
+        </div>
       </div>
 
       <div className="flex items-center gap-3">
         <motion.button
           whileTap={{ scale: 0.92 }}
-          onClick={toggle}
-          disabled={error}
-          aria-label={isPlaying ? '暂停' : '播放'}
+          onClick={handleToggle}
+          disabled={modeError}
+          aria-label={isBusy ? (mode === 'file' ? '暂停' : '停止朗读') : '播放'}
           className={
             'flex h-10 w-10 shrink-0 items-center justify-center rounded-full shadow-(--shadow-soft) transition-colors ' +
-            (error
+            (modeError
               ? 'cursor-not-allowed bg-sand text-ink-soft'
               : 'bg-terracotta text-parchment hover:bg-terracotta/90')
           }
         >
-          {error ? (
+          {modeError ? (
             <VolumeX className="h-4 w-4" />
-          ) : isPlaying ? (
+          ) : !isBusy ? (
+            <Play className="ml-0.5 h-4 w-4" />
+          ) : mode === 'file' ? (
             <Pause className="h-4 w-4" />
           ) : (
-            <Play className="ml-0.5 h-4 w-4" />
+            <Square className="h-3.5 w-3.5" />
           )}
         </motion.button>
 
-        <div className="min-w-0 flex-1">
-          <div
-            role="slider"
-            aria-label="播放进度"
-            aria-valuemin={0}
-            aria-valuemax={100}
-            aria-valuenow={Math.round(progress * 100)}
-            className="group relative h-5 cursor-pointer"
-            onClick={(e) => {
-              const rect = e.currentTarget.getBoundingClientRect()
-              seek((e.clientX - rect.left) / rect.width)
-            }}
-          >
-            <div className="absolute top-1/2 h-1.5 w-full -translate-y-1/2 rounded-full bg-sand" />
-            <motion.div
-              className="absolute top-1/2 h-1.5 -translate-y-1/2 rounded-full bg-terracotta"
-              style={{ width: `${progress * 100}%` }}
-            />
+        {mode === 'file' ? (
+          <div className="min-w-0 flex-1">
+            <div
+              role="slider"
+              aria-label="播放进度"
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={Math.round(file.progress * 100)}
+              className="group relative h-5 cursor-pointer"
+              onClick={(e) => {
+                const rect = e.currentTarget.getBoundingClientRect()
+                file.seek((e.clientX - rect.left) / rect.width)
+              }}
+            >
+              <div className="absolute top-1/2 h-1.5 w-full -translate-y-1/2 rounded-full bg-sand" />
+              <motion.div
+                className="absolute top-1/2 h-1.5 -translate-y-1/2 rounded-full bg-terracotta"
+                style={{ width: `${file.progress * 100}%` }}
+              />
+            </div>
+            <div className="flex justify-between text-[11px] tabular-nums text-ink-soft">
+              <span>{formatTime(file.progress * file.duration)}</span>
+              <span>{formatTime(file.duration)}</span>
+            </div>
           </div>
-          <div className="flex justify-between text-[11px] tabular-nums text-ink-soft">
-            <span>{formatTime(progress * duration)}</span>
-            <span>{formatTime(duration)}</span>
+        ) : (
+          <div className="min-w-0 flex-1 text-xs text-ink-soft">
+            {tts.isSpeaking ? (
+              <span className="font-medium text-navy">
+                正在朗读第 {tts.activeIndex + 1} / {segments.length} 句
+              </span>
+            ) : (
+              <span>SpeechSynthesis · fr-FR，点击播放逐句朗读，点击句子可从该句开始</span>
+            )}
           </div>
-        </div>
+        )}
       </div>
 
-      {error && (
+      {mode === 'file' && file.error && (
         <p className="mt-2 text-xs text-ink-soft">
-          音频文件暂不可用（{audio.url}），字幕文本仍可在下方选择语言查看。
+          音频文件暂不可用（{audio.url}），可切换到「朗读」用浏览器 TTS 收听。
+        </p>
+      )}
+      {mode === 'tts' && tts.error && (
+        <p className="mt-2 text-xs text-ink-soft">
+          当前浏览器没有可用的语音引擎，请切回「音频」模式。
         </p>
       )}
 
-      {/* 字幕联动：播放期间展示，随全局三档语言切换 */}
+      {/* 卡拉OK字幕：逐句高亮 + 自动滚动，文本随全局语言开关切换 */}
       <AnimatePresence>
-        {(hasStarted || error) && (
+        {showTranscript && (
           <motion.div
             initial={{ opacity: 0, height: 0, marginTop: 0 }}
             animate={{ opacity: 1, height: 'auto', marginTop: 12 }}
@@ -92,25 +189,12 @@ export default function AudioPlayer({ audio }: AudioPlayerProps) {
             transition={{ duration: 0.25 }}
             className="overflow-hidden"
           >
-            <div className="rounded-xl bg-parchment px-4 py-3">
-              <AnimatePresence mode="wait">
-                <motion.p
-                  key={lang}
-                  initial={{ opacity: 0, y: 6 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -6 }}
-                  transition={{ duration: 0.18 }}
-                  className={
-                    'text-sm leading-relaxed text-ink ' +
-                    (lang === 'fr' ? 'italic' : '')
-                  }
-                >
-                  {lang === 'fr'
-                    ? `« ${audio.transcript.fr} »`
-                    : audio.transcript[lang]}
-                </motion.p>
-              </AnimatePresence>
-            </div>
+            <KaraokeTranscript
+              segments={segments}
+              activeIndex={activeIndex}
+              lang={lang}
+              onSelect={handleSelect}
+            />
           </motion.div>
         )}
       </AnimatePresence>

@@ -7,6 +7,8 @@ export interface AudioControls {
   hasStarted: boolean
   /** 播放进度 0-1 */
   progress: number
+  /** 当前播放位置（秒），用于字幕时间戳匹配 */
+  currentTime: number
   /** 时长（秒），加载完成前为 0 */
   duration: number
   /** 音频加载/播放失败（如文件缺失） */
@@ -22,6 +24,7 @@ export function useAudio(url: string): AudioControls {
   const [isPlaying, setIsPlaying] = useState(false)
   const [hasStarted, setHasStarted] = useState(false)
   const [progress, setProgress] = useState(0)
+  const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
   const [error, setError] = useState(false)
 
@@ -30,13 +33,16 @@ export function useAudio(url: string): AudioControls {
     audio.preload = 'metadata'
     audioRef.current = audio
 
-    const onTime = () =>
+    const onTime = () => {
       setProgress(audio.duration ? audio.currentTime / audio.duration : 0)
+      setCurrentTime(audio.currentTime)
+    }
     const onLoaded = () => setDuration(audio.duration || 0)
     const onEnded = () => {
       setIsPlaying(false)
       setHasStarted(false)
       setProgress(0)
+      setCurrentTime(0)
     }
     const onError = () => {
       setError(true)
@@ -50,6 +56,7 @@ export function useAudio(url: string): AudioControls {
     setIsPlaying(false)
     setHasStarted(false)
     setProgress(0)
+    setCurrentTime(0)
     setDuration(0)
     setError(false)
 
@@ -85,7 +92,8 @@ export function useAudio(url: string): AudioControls {
     if (!audio || !audio.duration) return
     audio.currentTime = Math.min(Math.max(fraction, 0), 1) * audio.duration
     setProgress(fraction)
+    setCurrentTime(audio.currentTime)
   }, [])
 
-  return { isPlaying, hasStarted, progress, duration, error, toggle, seek }
+  return { isPlaying, hasStarted, progress, currentTime, duration, error, toggle, seek }
 }
