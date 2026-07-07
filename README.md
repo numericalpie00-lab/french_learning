@@ -25,6 +25,13 @@ npm run build    # 类型检查 + 生产构建
 - **顶部**：`src/components/LangToggle.tsx`，全局三档语言开关（纯法语沉浸 / 英文词源锚点 / 中文大白话逻辑），状态存于 zustand，沙盘解构卡片与音频字幕全部联动。
 - **语境直觉图谱**（左侧/主体）：`src/components/GraphPanel.tsx`，气泡按「交际目的」命名（请求、抱怨……），不按教材章节。自定义 `BubbleNode`（圆形气泡、缓慢漂浮、入场弹簧动画）+ 自定义 `BreathingEdge`（流动虚线呼吸明暗 + 巡游光点 + 进阶关系标签），连线代表语法进阶路线；题库暂未覆盖的目的显示为虚线锁定气泡。点击气泡进入沙盘。
 - **微型情境沙盘**（右侧）：`src/components/SandboxPanel.tsx`，分阶段渲染：A 情境代入 → 点击「代入好了，看表达」→ B 直觉选择（交错入场）→ C 三语解构（随全局开关）+ 音频 → D `tcf_b2_takeaway` 考点收尾于最下方。
+- **动态真题收集箱**（顶栏按钮 → 右侧抽屉）：`src/components/IngestionBox.tsx`，粘贴中法混合的考友机经，「解析并录入」后追加进题库并实时更新图谱气泡。
+
+## 真题收集箱（Dynamic Ingestion Box）
+
+- `src/lib/parseRawTextToSchema.ts`：模拟解析器（生产环境将替换为 LLM 调用）。启发式抽取法语句子（重音符号 + 功能词识别）、按关键词判定交际目的、推断语域（tu → familier / pourriez → soutenu）并标记最优表达，自动生成模板化三语映射、机经考点说明、假音频链接与逐句 mock 时间戳字幕；识别不到法语句子时返回 null，UI 给出校验提示。
+- `src/store/bankStore.ts`：题库 = 静态 `tcf_b2_bank.json` + LocalStorage（`tcf_b2_custom_bank`）中的收集箱条目，`addItem` 追加并持久化，`removeItem` 仅允许删除收集箱条目（`ingested-` 前缀）。
+- 图谱联动：气泡本就由题库数据驱动——录入新分类会解锁对应的虚线气泡（或在底部自动新增气泡），删除后重新锁定；录入成功后沙盘自动切换到新题。
 
 ## 音频系统
 
