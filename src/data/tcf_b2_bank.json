@@ -1,0 +1,66 @@
+[
+  {
+    "id": "tcf-b2-001",
+    "category": "请求",
+    "immersion_scenario": "你要回国三周，想请法国邻居 Madame Girard 帮你照看阳台上的植物。她人很好，但你们只是点头之交——直接说 « Tu peux... » 会不会太冒失？敲门之前，你在心里过了三遍台词。",
+    "options": [
+      {
+        "text": "Tu peux arroser mes plantes ?",
+        "register": "familier",
+        "is_best": false
+      },
+      {
+        "text": "Pourriez-vous arroser mes plantes pendant mon absence ?",
+        "register": "soutenu",
+        "is_best": true
+      },
+      {
+        "text": "Ça vous dérangerait de jeter un œil à mes plantes ?",
+        "register": "courant-poli",
+        "is_best": false
+      }
+    ],
+    "trilingual_mapping": {
+      "fr": "« Pourriez-vous + infinitif » est la formule de politesse par excellence : le conditionnel adoucit la demande et laisse à l'autre la liberté de refuser. Entre voisins qu'on vouvoie, c'est le choix le plus sûr.",
+      "en_anchor": "« Pourriez-vous » = \"Could you\". The verb « pouvoir » shares the Latin root *posse/potere* with English \"power\" and \"possible\" — asking about someone's *power* to help, in the conditional, is exactly the English \"Could you possibly...?\" move.",
+      "zh_logic": "核心逻辑就一条：把'你能'说成'您能否'。conditionnel（-riez 结尾）等于给请求包了一层软垫——我不是命令你，是留了拒绝的余地。对不熟的人、老师、房东，开口先上 Pourriez-vous，永远不会错。"
+    },
+    "tcf_b2_takeaway": "TCF Canada 口语 Tâche 2 常考'向陌生人/机构提出请求'（如请房东修暖气、请市政厅提供信息）。B2 评分点：必须自然使用条件式礼貌句（Pourriez-vous... / J'aimerais savoir si... / Serait-il possible de...），全程 vouvoiement 不掉链子。",
+    "audio": {
+      "url": "/audio/tcf_b2_001.mp3",
+      "transcript": "Bonjour Madame Girard, excusez-moi de vous déranger. Je pars trois semaines au Canada... Pourriez-vous arroser mes plantes pendant mon absence ? Je vous en serais très reconnaissante."
+    }
+  },
+  {
+    "id": "tcf-b2-002",
+    "category": "抱怨",
+    "immersion_scenario": "网购的咖啡机到货第三天就罢工了，客服电话永远占线。你打开邮箱准备写投诉信——第一句就卡住了：直接开骂 « C'est inadmissible ! » 解气，但你隐约记得，法国人的投诉信讲究'先客气，再亮剑'。",
+    "options": [
+      {
+        "text": "C'est inadmissible, je veux un remboursement immédiat !",
+        "register": "agressif",
+        "is_best": false
+      },
+      {
+        "text": "Je me permets de vous contacter au sujet d'un problème concernant ma commande n°4587.",
+        "register": "formel",
+        "is_best": true
+      },
+      {
+        "text": "Je tiens à exprimer mon mécontentement concernant votre service.",
+        "register": "formel-ferme",
+        "is_best": false
+      }
+    ],
+    "trilingual_mapping": {
+      "fr": "« Je me permets de vous contacter... » est l'ouverture classique d'une lettre de réclamation : on pose d'abord les faits avec courtoisie, puis on exprime son mécontentement et on formule une exigence claire (remboursement, échange). L'agressivité d'emblée décrédibilise la plainte.",
+      "en_anchor": "« Je me permets » = literally \"I permit myself\" (cf. English \"permit\"). « mécontentement » decomposes exactly like English: mé- (dis-) + content + -ment = \"discontentment\". French complaint letters escalate: permit myself → discontent → demand.",
+      "zh_logic": "法式投诉的套路是'冷静叙事 → 表达不满 → 明确要求'三段式。开头用 Je me permets de...（恕我冒昧联系您）先站稳'讲理的人'的位置，中段再用 mécontentement 亮明不满，最后提具体要求。一上来就吼，反而显得没底气。"
+    },
+    "tcf_b2_takeaway": "TCF Canada 写作 Tâche 2/3 高频题型：写一封正式投诉信（服务差、商品缺陷、账单错误）。B2 评分点：格式完整（Madame, Monsieur / 结尾敬语），套语准确（Je me permets de... / Je vous saurais gré de bien vouloir me rembourser），语气坚定但不失礼。",
+    "audio": {
+      "url": "/audio/tcf_b2_002.mp3",
+      "transcript": "Madame, Monsieur, je me permets de vous contacter au sujet d'un problème concernant ma commande numéro 4587. La machine à café reçue le 3 mars ne fonctionne plus depuis trois jours. Je vous saurais gré de bien vouloir procéder à un échange ou à un remboursement."
+    }
+  }
+]

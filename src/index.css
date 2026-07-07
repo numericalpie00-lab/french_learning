@@ -1,0 +1,59 @@
+@import 'tailwindcss';
+@import 'reactflow/dist/style.css';
+
+/* ---- Warm Analog design tokens ---- */
+@theme {
+  /* Parchment / journal backgrounds */
+  --color-parchment: #f9f6f0;
+  --color-cream: #fffdf8;
+  --color-sand: #efe9dd;
+
+  /* Ink */
+  --color-ink: #2d3142;
+  --color-navy: #1e2a44;
+  --color-ink-soft: #5c6270;
+
+  /* Accents */
+  --color-terracotta: #c1674d;
+  --color-olive: #7a8450;
+  --color-gold: #b98a2e;
+
+  --shadow-soft: 0 2px 12px rgba(45, 49, 66, 0.08);
+  --shadow-card: 0 4px 20px rgba(45, 49, 66, 0.1);
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  background-color: var(--color-parchment);
+  color: var(--color-ink);
+  font-family:
+    ui-sans-serif, system-ui, -apple-system, 'Segoe UI', 'PingFang SC',
+    'Noto Sans SC', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Subtle paper grain on the global background */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image: radial-gradient(rgba(45, 49, 66, 0.035) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+/* React Flow: keep the canvas transparent so the parchment shows through */
+.react-flow__pane {
+  background: transparent;
+}
+
+.react-flow__attribution {
+  background: transparent;
+  color: var(--color-ink-soft);
+}
