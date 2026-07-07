@@ -71,6 +71,19 @@ npm run build    # 类型检查 + 生产构建
 
 音频文件放在 `public/audio/`。
 
+## 教学资源批量下载（download_media.py）
+
+项目根目录的 `download_media.py` 用于批量下载 freemdict 开放目录中的「你好法语 0-B1」教学资源（A1/A2 的音频/视频/文本）到 `public/media/`（已加入 `.gitignore`，不入库）：
+
+```bash
+pip install requests beautifulsoup4 tqdm
+python3 download_media.py --dry-run    # 先看会下载哪些文件
+python3 download_media.py              # 正式下载（默认只要 A1/A2）
+python3 download_media.py --all        # 不过滤，全部下载
+```
+
+递归爬取子目录、保留目录结构、已存在且大小一致的文件自动跳过（可断点续跑）、失败自动重试 3 次；进度条优先用 tqdm，未安装时退回内置简易进度条。注意：请在本机运行——Claude 云端容器的网络策略不允许访问该站点。
+
 ## Warm Analog 设计令牌
 
 | 令牌 | 值 | 用途 |

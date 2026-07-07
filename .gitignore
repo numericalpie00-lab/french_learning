@@ -12,6 +12,10 @@ dist
 dist-ssr
 *.local
 
+# 批量下载的教学资源（体积大，不入库）
+public/media/
+*.part
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
